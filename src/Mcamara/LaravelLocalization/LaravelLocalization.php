@@ -300,6 +300,39 @@ class LaravelLocalization
     }
 
     /**
+     * Check if a URL is localized in Routes, if it is , then we will ignore it
+     *
+     * @param $url
+     * @return bool
+     */
+    public function shouldIgnoreUrlLocalizedUrl($url){
+        $routeCollection = $this->router->getRoutes();
+        $middlewareNames = ['localizationRedirect'];
+        $routeFiltered = [];
+        /** @var \Illuminate\Routing\RouteCollection $routeCollection */
+        foreach ($routeCollection as $route)
+        {
+            /** @var \Illuminate\Routing\Route  $route */
+            $middleware = $route->middleware();
+            if (\count($middleware) > 0)
+            {
+                foreach($middlewareNames as $name){
+                    if (\in_array($name, $middleware,true))
+                    {
+                        $routeFiltered[] = $route->uri();
+                    }
+                }
+            }
+        }
+
+        if(\in_array($url,$routeFiltered,true)){
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Returns an URL adapted to the route name and the locale given.
      *
      *
